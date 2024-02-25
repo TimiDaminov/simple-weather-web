@@ -6,11 +6,23 @@ import SearchBar from "./components/SearchBar";
 import UseDebounce from "./hooks/UseDebounce";
 import WeatherData from "./components/WeatherData";
 import Footer from "./components/Footer";
-
+import { useGeolocated } from "react-geolocated";
 const App = () => {
-  const [cityName, setCityName] = useState("Riga");
-  const [displayedCity, setDisplayedCity] = useState({ title: "", index: "" });
+  const [cityName, setCityName] = useState("New York");
+  const [displayedCity, setDisplayedCity] = useState({
+    title: null,
+    index: null,
+  });
   const [weather, setWeather] = useState({ temperature: 0, description: "" });
+
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: false,
+      },
+      userDecisionTimeout: 5000,
+    });
+
   const debouncedSearch = UseDebounce(cityName, 2000);
   useEffect(() => {
     !!debouncedSearch &&
@@ -25,12 +37,31 @@ const App = () => {
 
   return (
     <div className="container">
+      {/* <div className="user_location">
+        {!isGeolocationAvailable ? (
+          <h1>Your browser does not support Geolocation</h1>
+        ) : !isGeolocationEnabled ? (
+          <h1>Please enable geolocation</h1>
+        ) : coords ? (
+          <div>
+            <h1>Latitude:</h1>
+            <h3>{coords.latitude}</h3>
+            <h1>Longitude:</h1>
+            <h3>{coords.longitude}</h3>
+          </div>
+        ) : (
+          ""
+        )}
+      </div> */}
+
       <SearchBar cityName={cityName} setCityName={setCityName} />
-      <WeatherData
-        debouncedSearch={debouncedSearch}
-        weather={weather}
-        countryIndex={displayedCity.index}
-      />
+      <>
+        <WeatherData
+          debouncedSearch={debouncedSearch}
+          weather={weather}
+          countryIndex={displayedCity.index}
+        />
+      </>
       <Footer />
     </div>
   );
